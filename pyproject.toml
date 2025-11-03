@@ -39,6 +39,7 @@ Homepage = "https://github.com/yourusername/num2persian"
 Repository = "https://github.com/yourusername/num2persian"
 Issues = "https://github.com/yourusername/num2persian/issues"
 Changelog = "https://github.com/yourusername/num2persian/blob/main/CHANGELOG.md"
+"NPM Package" = "https://www.npmjs.com/package/persian-number-words"
 
 [project.scripts]
 num2persian = "num2persian.cli:main"

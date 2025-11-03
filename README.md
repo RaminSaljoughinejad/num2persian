@@ -1,6 +1,7 @@
 # num2persian
 
 [![PyPI version](https://badge.fury.io/py/num2persian.svg)](https://pypi.org/project/num2persian/)
+[![npm version](https://badge.fury.io/js/persian-number-words.svg)](https://www.npmjs.com/package/persian-number-words)
 
 Convert numbers to Persian words. Available in both Python and TypeScript implementations.
 
@@ -12,13 +13,10 @@ pip install num2persian
 
 ## TypeScript Implementation
 
-This project also includes a TypeScript implementation available in the `typescript/` directory.
+This project also includes a TypeScript implementation available as an NPM package.
 
 ```bash
-cd typescript
-npm install
-npm run build
-npm test
+npm install persian-number-words
 ```
 
 For more information, see [typescript/README.md](typescript/README.md).
