@@ -9,6 +9,7 @@ Convert numbers to Persian (Farsi) words with zero dependencies and full TypeScr
 - ✅ ESM and CommonJS support
 - ✅ Works in Node.js, browsers, React, Next.js, Vite, Bun, and Deno
 - ✅ Handles negative numbers
+- ✅ **NEW in v2.0:** Full decimal number support
 - ✅ Supports very large numbers (up to quadrillions and beyond)
 - ✅ Lightweight (< 5KB)
 
@@ -33,9 +34,15 @@ bun add persian-number-words
 ```typescript
 import { toWords } from 'persian-number-words';
 
-toWords(123);  // "یکصد و بیست و سه"
-toWords(0);    // "صفر"
-toWords(-456); // "منفی چهارصد و پنجاه و شش"
+// Integers
+toWords(123);   // "یکصد و بیست و سه"
+toWords(0);     // "صفر"
+toWords(-456);  // "منفی چهارصد و پنجاه و شش"
+
+// Decimals (v2.0+)
+toWords(3.14);  // "سه ممیز چهارده صدم"
+toWords(0.5);   // "صفر ممیز پنج دهم"
+toWords(-2.71); // "منفی دو ممیز هفتاد و یک صدم"
 ```
 
 ## Usage
@@ -55,6 +62,11 @@ console.log(toWords("789"));     // "هفتصد و هشتاد و نه"
 
 // Negative numbers
 console.log(toWords(-123));      // "منفی یکصد و بیست و سه"
+
+// Decimal numbers (v2.0+)
+console.log(toWords(3.14));      // "سه ممیز چهارده صدم"
+console.log(toWords(0.5));       // "صفر ممیز پنج دهم"
+console.log(toWords(-2.718));    // "منفی دو ممیز هفتصد و هجده هزارم"
 ```
 
 ### JavaScript (CommonJS)
@@ -176,32 +188,62 @@ toWords(1000000000000000);  // "یک کوادریلیون"
 toWords("42");       // "چهل و دو"
 toWords("  999  ");  // "نهصد و نود و نه" (whitespace is trimmed)
 toWords("1000000");  // "یک میلیون"
+toWords("3.14");     // "سه ممیز چهارده صدم"
+```
+
+### Decimal Numbers (v2.0+)
+
+```typescript
+// Positive decimals
+toWords(0.5);        // "صفر ممیز پنج دهم"
+toWords(3.14);       // "سه ممیز چهارده صدم"
+toWords(123.456);    // "یکصد و بیست و سه ممیز چهارصد و پنجاه و شش هزارم"
+
+// Negative decimals
+toWords(-0.5);       // "منفی صفر ممیز پنج دهم"
+toWords(-3.14);      // "منفی سه ممیز چهارده صدم"
+
+// Small decimals
+toWords(0.01);       // "صفر ممیز یک صدم"
+toWords(0.001);      // "صفر ممیز یک هزارم"
+toWords(0.0001);     // "صفر ممیز یک ده‌هزارم"
+
+// String input with decimals
+toWords("3.14");     // "سه ممیز چهارده صدم"
+toWords("  0.5  ");  // "صفر ممیز پنج دهم" (whitespace is trimmed)
 ```
 
 ## API Reference
 
 ### `toWords(input: number | string): string`
 
-Converts a number to Persian words.
+Converts a number (integer or decimal) to Persian words.
 
 **Parameters:**
-- `input` - A number or numeric string to convert. Must be an integer (no fractional parts).
+- `input` - A number or numeric string to convert. Supports both integers and decimals.
 
 **Returns:**
 - A string containing the Persian word representation of the number.
 
 **Throws:**
 - `TypeError` - If input is not a number or string (e.g., null, undefined, object)
-- `RangeError` - If input is a float with fractional parts or a non-numeric string
+- `RangeError` - If input cannot be parsed, is not finite (Infinity, NaN), or is an invalid string
 
 **Examples:**
 
 ```typescript
+// Integers
 toWords(0);           // "صفر"
 toWords(123);         // "یکصد و بیست و سه"
 toWords(-456);        // "منفی چهارصد و پنجاه و شش"
 toWords("789");       // "هفتصد و هشتاد و نه"
 toWords(1000000000);  // "یک میلیارد"
+
+// Decimals (v2.0+)
+toWords(3.14);        // "سه ممیز چهارده صدم"
+toWords(0.5);         // "صفر ممیز پنج دهم"
+toWords(-2.718);      // "منفی دو ممیز هفتصد و هجده هزارم"
+toWords("0.001");     // "صفر ممیز یک هزارم"
 ```
 
 ## Error Handling
@@ -209,18 +251,18 @@ toWords(1000000000);  // "یک میلیارد"
 The library throws descriptive errors for invalid inputs:
 
 ```typescript
-// Float with fractional parts
-try {
-  toWords(3.14);
-} catch (error) {
-  console.error(error);  // RangeError: Float numbers with fractional parts are not supported: 3.14
-}
-
 // Non-numeric string
 try {
   toWords("abc");
 } catch (error) {
-  console.error(error);  // RangeError: Cannot convert string to integer: 'abc'
+  console.error(error);  // RangeError: Cannot convert string to number: 'abc'
+}
+
+// Invalid decimal string
+try {
+  toWords("3.14.15");
+} catch (error) {
+  console.error(error);  // RangeError: Cannot convert string to number: '3.14.15'
 }
 
 // Invalid type
@@ -229,7 +271,30 @@ try {
 } catch (error) {
   console.error(error);  // TypeError: Input must be a number or string, got null
 }
+
+// Infinity or NaN
+try {
+  toWords(Infinity);
+} catch (error) {
+  console.error(error);  // RangeError: Number must be finite: Infinity
+}
 ```
+
+## Migration from v1.x to v2.0
+
+Version 2.0 is **fully backward compatible** with v1.x. All existing integer conversion code will work identically:
+
+```typescript
+// v1.x code - works exactly the same in v2.0
+toWords(123);   // "یکصد و بیست و سه"
+toWords(-456);  // "منفی چهارصد و پنجاه و شش"
+toWords("789"); // "هفتصد و هشتاد و نه"
+
+// v2.0 new feature - decimal support
+toWords(3.14);  // "سه ممیز چهارده صدم"
+```
+
+No code changes are required to upgrade from v1.x to v2.0.
 
 ## Browser Support
 

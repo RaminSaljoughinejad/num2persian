@@ -1,7 +1,7 @@
 {
   "name": "persian-number-words",
-  "version": "1.0.0",
-  "description": "Convert numbers to Persian words - zero dependencies, TypeScript support",
+  "version": "2.0.0",
+  "description": "Convert numbers to Persian words - zero dependencies, TypeScript support, decimal support",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -34,7 +34,9 @@
     "words",
     "converter",
     "typescript",
-    "i18n"
+    "i18n",
+    "decimal",
+    "float"
   ],
   "author": "",
   "license": "MIT",
