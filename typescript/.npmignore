@@ -1,0 +1,30 @@
+# Source files
+src/
+
+# Tests
+tests/
+
+# Configuration
+tsconfig.json
+tsup.config.ts
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Documentation (keep README and LICENSE)
+*.md
+!README.md
+
+# Misc
+.DS_Store
+*.log
+.env
+.kiro/
