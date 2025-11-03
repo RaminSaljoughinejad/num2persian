@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "num2persian"
+version = "0.1.0"
+description = "Convert numbers to Persian words"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Ramin Saljoughinejad", email = "ramin.saljoughi@icloud.com"},
+    {name = "Hamed Zeidabadi", email = "zeidabadi73@gmail.com"},
+]
+maintainers = [
+    {name = "Ramin Saljoughinejad", email = "ramin.saljoughi@icloud.com"},
+    {name = "Hamed Zeidabadi", email = "zeidabadi73@gmail.com"},
+]
+keywords = ["persian", "numbers", "words", "converter", "farsi", "typescript", "multi-language"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+    "Topic :: Text Processing :: Linguistic",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/yourusername/num2persian"
+Repository = "https://github.com/yourusername/num2persian"
+Issues = "https://github.com/yourusername/num2persian/issues"
+Changelog = "https://github.com/yourusername/num2persian/blob/main/CHANGELOG.md"
+
+[project.scripts]
+num2persian = "num2persian.cli:main"
+
+[tool.setuptools]
+zip-safe = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
