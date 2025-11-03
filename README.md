@@ -5,6 +5,8 @@
 
 Convert numbers to Persian words. Available in both Python and TypeScript implementations.
 
+📖 **Read this in [Persian](README_FA.md)**
+
 ## Installation
 
 ```bash
