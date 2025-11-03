@@ -16,33 +16,43 @@ THOUSANDS_UNITS = [
     "تردسیلیون", "کوادردسیلیون", "کوانتدسیلیون"
 ]
 
+# Decimal suffixes
+DECIMAL_SUFFIX = {
+    1: "دهم",
+    2: "صدم",
+    3: "هزارم",
+    4: "ده‌هزارم",
+    5: "صد‌هزارم",
+    6: "میلیونیم",
+    7: "ده‌میلیونیم",
+    8: "صد‌میلیونیم",
+    9: "میلیاردم"
+}
 
-def _normalize_input(number: Union[int, str, float]) -> int:
+
+def _normalize_input(number: Union[int, str, float]) -> float:
     """
-    Normalize input to integer, rejecting floats with fractional parts.
+    Normalize input to float.
 
     Args:
         number: Input number to normalize
 
     Returns:
-        Integer representation of the input
+        Float representation of the input
 
     Raises:
-        ValueError: If input cannot be converted to integer or has fractional part
+        ValueError: If input cannot be converted to float
     """
-    if isinstance(number, float):
-        if not number.is_integer():
-            raise ValueError(f"Float numbers with fractional parts are not supported: {number}")
-        number = int(number)
-
     if isinstance(number, str):
         try:
-            number = int(number.strip())
+            number = float(number.strip())
         except ValueError:
-            raise ValueError(f"Cannot convert string to integer: '{number}'")
+            raise ValueError(f"Cannot convert string to number: '{number}'")
 
-    if not isinstance(number, int):
-        raise ValueError(f"Input must be an integer or integer-convertible string, got {type(number)}: {number}")
+    try:
+        number = float(number)
+    except (TypeError, ValueError):
+        raise ValueError(f"Input must be a number or number-convertible string, got {type(number)}: {number}")
 
     return number
 
@@ -88,13 +98,13 @@ def to_words(number: Union[int, str, float]) -> str:
     Convert a number to Persian words.
 
     Args:
-        number: Integer to convert (accepts int, str that converts to int, or float without fractional part)
+        number: Number to convert (accepts int, str that converts to number, or float)
 
     Returns:
         Persian words representation of the number
 
     Raises:
-        ValueError: If input cannot be converted to integer or is invalid
+        ValueError: If input cannot be converted to number or is invalid
 
     Examples:
         >>> to_words(0)
@@ -105,6 +115,10 @@ def to_words(number: Union[int, str, float]) -> str:
         'منفی یکصد و بیست و سه'
         >>> to_words("456")
         'چهارصد و پنجاه و شش'
+        >>> to_words(3.14)
+        'سه ممیز چهارده صدم'
+        >>> to_words(0.5)
+        'صفر ممیز پنج دهم'
     """
     num = _normalize_input(number)
 
@@ -116,6 +130,46 @@ def to_words(number: Union[int, str, float]) -> str:
     if is_negative:
         num = -num
 
+    # Split into integer and decimal parts
+    integer_part = int(num)
+    decimal_part = num - integer_part
+
+    # Convert integer part
+    if integer_part == 0:
+        integer_words = "صفر"
+    else:
+        integer_words = _convert_integer_to_words(integer_part)
+
+    # Convert decimal part
+    decimal_words = ""
+    if decimal_part > 0:
+        # Convert decimal part to string and extract the decimal digits
+        decimal_str = f"{decimal_part:.10f}".split('.')[1].rstrip('0')
+        decimal_words = _convert_decimal_to_words(decimal_str)
+
+    # Combine parts
+    if decimal_words:
+        result = f"{integer_words} ممیز {decimal_words}"
+    else:
+        result = integer_words
+
+    # Add negative prefix if needed
+    if is_negative:
+        result = f"منفی {result}"
+
+    return result
+
+
+def _convert_integer_to_words(num: int) -> str:
+    """
+    Convert integer part to Persian words.
+
+    Args:
+        num: Integer to convert
+
+    Returns:
+        Persian words representation
+    """
     # Convert to string and split into 3-digit chunks
     num_str = str(num)
     chunks = []
@@ -139,10 +193,37 @@ def to_words(number: Union[int, str, float]) -> str:
                 part = f"{part} {unit}"
             parts.append(part)
 
-    result = " و ".join(parts)
+    return " و ".join(parts)
 
-    # Add negative prefix if needed
-    if is_negative:
-        result = f"منفی {result}"
 
-    return result
+def _convert_decimal_to_words(decimal_str: str) -> str:
+    """
+    Convert decimal part to Persian words.
+
+    Args:
+        decimal_str: String representation of decimal part (without leading '0.')
+
+    Returns:
+        Persian words representation with appropriate suffixes
+    """
+    if not decimal_str:
+        return ""
+
+    # Convert the decimal part as a whole number
+    decimal_num = int(decimal_str)
+
+    # Convert to words (handle zero specially)
+    if decimal_num == 0:
+        decimal_words = "صفر"
+    else:
+        decimal_words = _convert_integer_to_words(decimal_num)
+
+    # Get the appropriate suffix based on decimal places
+    decimal_places = len(decimal_str)
+    if decimal_places in DECIMAL_SUFFIX:
+        suffix = DECIMAL_SUFFIX[decimal_places]
+    else:
+        # For positions beyond our defined suffixes, use scientific notation
+        suffix = f"۱۰^{-decimal_places}"
+
+    return f"{decimal_words} {suffix}"

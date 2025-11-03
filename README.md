@@ -52,10 +52,11 @@ num2persian --help
 
 ## Features
 
-- Convert integers (positive, negative, and zero) to Persian words
-- Accept string inputs that can be converted to integers
+- Convert integers and decimal numbers (positive, negative, and zero) to Persian words
+- Accept string inputs that can be converted to numbers
 - Proper Persian grammar with correct "و" (and) placement
 - Support for very large numbers with scientific notation fallback
+- Decimal numbers with appropriate Persian suffixes (دهم, صدم, هزارم, etc.)
 - Command-line interface
 - Comprehensive test coverage
 
@@ -76,6 +77,12 @@ to_words(2025)   # "دو هزار و بیست و پنج"
 # Large numbers
 to_words(1000000)    # "یک میلیون"
 to_words(1000000000) # "یک میلیارد"
+
+# Decimal numbers
+to_words(3.14)   # "سه ممیز چهارده صدم"
+to_words(0.5)    # "صفر ممیز پنج دهم"
+to_words(1.234)  # "یک ممیز دویست و سی و چهار هزارم"
+to_words(12.25)  # "دوازده ممیز بیست و پنج صدم"
 
 # Negative numbers
 to_words(-42)    # "منفی چهل و دو"
