@@ -1,4 +1,6 @@
-# Persian Numbers
+# num2persian
+
+[![PyPI version](https://badge.fury.io/py/num2persian.svg)](https://pypi.org/project/num2persian/)
 
 Convert numbers to Persian words. Available in both Python and TypeScript implementations.
 

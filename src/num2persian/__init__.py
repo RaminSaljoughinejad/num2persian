@@ -1,4 +1,4 @@
-"""Persian Numbers: Convert numbers to Persian words."""
+"""num2persian: Convert numbers to Persian words."""
 
 __version__ = "0.1.0"
 
