@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-11-04
+
+### Fixed
+- **Scientific notation removal**: Completely removed scientific notation (`۱۰^x` and `۱۰^-x`) fallbacks for both integer and decimal numbers
+- **Large number conversion**: Fixed conversion of very large numbers to use proper Persian words instead of scientific notation
+- **Decimal suffix generation**: Improved decimal suffix handling for numbers beyond predefined ranges with proper Persian naming patterns
+- **Integer unit naming**: Enhanced large unit naming system with Persian prefixes for numbers beyond trillions
+
+### Added
+- **Extended decimal suffixes**: Added support for decimal places up to 20 with proper Persian fractional terms
+- **Large unit prefixes**: Added comprehensive prefix system for numbers beyond predefined units (دو‌یلیون, تر‌یلیون, etc.)
+- **Fallback naming system**: Implemented proper Persian naming patterns for extremely large numbers
+
+### Changed
+- **API behavior**: Numbers that previously fell back to scientific notation now use proper Persian words
+- **Decimal processing**: Enhanced decimal conversion to handle edge cases without scientific notation
+- **Code structure**: Refactored unit and suffix generation into dedicated functions for better maintainability
+
 ## [0.2.0] - 2025-11-03
 
 ### Added

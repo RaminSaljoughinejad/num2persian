@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "num2persian"
-version = "0.2.0"
+version = "2.0.0"
 description = "Convert numbers to Persian words"
 readme = "README.md"
 license = {text = "MIT"}

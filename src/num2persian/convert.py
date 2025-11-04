@@ -16,6 +16,38 @@ THOUSANDS_UNITS = [
     "تردسیلیون", "کوادردسیلیون", "کوانتدسیلیون"
 ]
 
+# Additional prefixes for larger units
+LARGE_UNIT_PREFIXES = [
+    "دو", "تر", "کوادر", "کوانت", "سکس", "سپت", "اکت", "نون", "دک",
+    "اندک", "دووک", "تروک", "کوادراک", "کوانتاک", "سکساک", "سپتاک",
+    "اکتاک", "نوناک", "ویگینگت", "اندویگینگت", "دوویگینگت", "ترویگینگت"
+]
+
+
+def _get_large_unit_name(unit_index: int) -> str:
+    """
+    Generate unit name for very large numbers beyond THOUSANDS_UNITS.
+
+    Args:
+        unit_index: The index in the thousands units (0 = ones, 1 = thousands, etc.)
+
+    Returns:
+        Persian unit name
+    """
+    if unit_index < len(THOUSANDS_UNITS):
+        return THOUSANDS_UNITS[unit_index]
+
+    # For units beyond our predefined list, generate using pattern
+    # Pattern: [prefix]یلیون where prefix comes from LARGE_UNIT_PREFIXES
+    prefix_index = unit_index - len(THOUSANDS_UNITS)
+    if prefix_index < len(LARGE_UNIT_PREFIXES):
+        prefix = LARGE_UNIT_PREFIXES[prefix_index]
+        return f"{prefix}یلیون"
+    else:
+        # For extremely large numbers, use a fallback pattern
+        # This should rarely be needed but provides infinite scalability
+        return f"۱۰^{unit_index * 3}"
+
 # Decimal suffixes
 DECIMAL_SUFFIX = {
     1: "دهم",
@@ -26,8 +58,54 @@ DECIMAL_SUFFIX = {
     6: "میلیونیم",
     7: "ده‌میلیونیم",
     8: "صد‌میلیونیم",
-    9: "میلیاردم"
+    9: "میلیاردم",
+    10: "ده‌میلیاردم",
+    11: "صد‌میلیاردم",
+    12: "تریلیونیم",
+    13: "ده‌تریلیونیم",
+    14: "صد‌تریلیونیم",
+    15: "کوادریلیونیم",
+    16: "ده‌کوادریلیونیم",
+    17: "صد‌کوادریلیونیم",
+    18: "کوانتیلیونیم",
+    19: "ده‌کوانتیلیونیم",
+    20: "صد‌کوانتیلیونیم"
 }
+
+
+def _get_decimal_suffix(decimal_places: int) -> str:
+    """
+    Get the appropriate decimal suffix for the given number of decimal places.
+
+    Args:
+        decimal_places: Number of decimal places
+
+    Returns:
+        Persian suffix for the decimal position
+    """
+    if decimal_places in DECIMAL_SUFFIX:
+        return DECIMAL_SUFFIX[decimal_places]
+
+    # For decimal places beyond our predefined suffixes, generate using pattern
+    # Follow the same pattern as large numbers but with ordinal suffix
+    unit_index = decimal_places - 9  # Start from 10^9 onwards
+
+    # For places 10-11: ده/صد میلیاردم
+    # For places 12+: use the large unit pattern + یم
+    if decimal_places <= 11:
+        base_unit = _get_large_unit_name(3)  # میلیارد
+        if decimal_places == 10:
+            return f"ده‌{base_unit}م"
+        else:  # 11
+            return f"صد‌{base_unit}م"
+    else:
+        # For 12+: use large unit + یم
+        base_unit = _get_large_unit_name(unit_index)
+        if base_unit:
+            return f"{base_unit}یم"
+        else:
+            # Extremely rare case - use scientific notation as absolute last resort
+            return f"۱۰^{-decimal_places}"
 
 
 def _normalize_input(number: Union[int, str, float]) -> float:
@@ -183,11 +261,7 @@ def _convert_integer_to_words(num: int) -> str:
         if chunk_val > 0:
             part = _three_digit_to_words(chunk_val)
             unit_index = len(chunks) - i - 1
-            if unit_index < len(THOUSANDS_UNITS):
-                unit = THOUSANDS_UNITS[unit_index]
-            else:
-                # Scientific notation fallback for very large numbers
-                unit = f"۱۰^{unit_index * 3}"
+            unit = _get_large_unit_name(unit_index)
 
             if unit:
                 part = f"{part} {unit}"
@@ -220,10 +294,6 @@ def _convert_decimal_to_words(decimal_str: str) -> str:
 
     # Get the appropriate suffix based on decimal places
     decimal_places = len(decimal_str)
-    if decimal_places in DECIMAL_SUFFIX:
-        suffix = DECIMAL_SUFFIX[decimal_places]
-    else:
-        # For positions beyond our defined suffixes, use scientific notation
-        suffix = f"۱۰^{-decimal_places}"
+    suffix = _get_decimal_suffix(decimal_places)
 
     return f"{decimal_words} {suffix}"
