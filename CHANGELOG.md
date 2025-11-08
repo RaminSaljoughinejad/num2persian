@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2025-11-04
+
+### Fixed
+- **Floating-point precision**: Fixed decimal precision loss for large integers by switching from `float` to `decimal.Decimal` type
+- **Decimal arithmetic**: Updated `_normalize_input()` to use `Decimal(str(number))` for maintaining exact decimal representation
+- **Large number decimals**: Corrected decimal conversion for numbers like `2564587542.361` that were affected by floating-point mantissa precision limits
+
+### Technical Details
+- **decimal.Decimal**: Replaced `float` with `Decimal` for input processing to preserve arbitrary precision
+- **String conversion**: Uses `Decimal(str(number))` to capture exact input representation
+- **Backward compatibility**: Maintains same API while fixing precision issues
+
+## [2.0.1] - 2025-11-04
+
+### Fixed
+- **Decimal conversion bug**: Fixed incorrect decimal part processing where decimal digits were incorrectly converted using large integer logic instead of regular number conversion
+- **Decimal suffix application**: Corrected decimal suffix handling to properly convert decimal parts like "361" to "سیصد و شصت و یک" followed by appropriate suffixes
+
+### Examples
+- `2564587542.361` now correctly converts to "دو میلیارد و پانصد و شصت و چهار میلیون و پانصد و هشتاد و هفت هزار و پانصد و چهل و دو ممیز سیصد و شصت و یک میلیونیم"
+- `0.361` correctly converts to "صفر ممیز سیصد و شصت و یک میلیونیم"
+
 ## [2.0.0] - 2025-11-04
 
 ### Fixed

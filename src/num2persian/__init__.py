@@ -1,6 +1,6 @@
 """num2persian: Convert numbers to Persian words."""
 
-__version__ = "2.0.0"
+__version__ = "2.0.2"
 
 from .convert import to_words
 

@@ -1,6 +1,7 @@
 """Persian number to words converter."""
 
 from typing import Union
+from decimal import Decimal
 
 # Persian number mappings
 ONES = ["", "یک", "دو", "سه", "چهار", "پنج", "شش", "هفت", "هشت", "نه"]
@@ -108,31 +109,30 @@ def _get_decimal_suffix(decimal_places: int) -> str:
             return f"۱۰^{-decimal_places}"
 
 
-def _normalize_input(number: Union[int, str, float]) -> float:
+def _normalize_input(number: Union[int, str, float]) -> Decimal:
     """
-    Normalize input to float.
+    Normalize input to Decimal for precision preservation.
 
     Args:
         number: Input number to normalize
 
     Returns:
-        Float representation of the input
+        Decimal representation of the input
 
     Raises:
-        ValueError: If input cannot be converted to float
+        ValueError: If input cannot be converted to Decimal
     """
     if isinstance(number, str):
         try:
-            number = float(number.strip())
+            return Decimal(number.strip())
         except ValueError:
             raise ValueError(f"Cannot convert string to number: '{number}'")
 
     try:
-        number = float(number)
+        # Use string representation to preserve precision
+        return Decimal(str(number))
     except (TypeError, ValueError):
         raise ValueError(f"Input must be a number or number-convertible string, got {type(number)}: {number}")
-
-    return number
 
 
 def _three_digit_to_words(num: int) -> str:
@@ -286,14 +286,50 @@ def _convert_decimal_to_words(decimal_str: str) -> str:
     # Convert the decimal part as a whole number
     decimal_num = int(decimal_str)
 
-    # Convert to words (handle zero specially)
+    # Convert to words using regular number conversion (not large integer conversion)
+    # For decimals, we want "361" to become "سیصد و شصت و یک", not treated as large units
     if decimal_num == 0:
         decimal_words = "صفر"
     else:
-        decimal_words = _convert_integer_to_words(decimal_num)
+        decimal_words = _convert_regular_number_to_words(decimal_num)
 
     # Get the appropriate suffix based on decimal places
     decimal_places = len(decimal_str)
     suffix = _get_decimal_suffix(decimal_places)
 
     return f"{decimal_words} {suffix}"
+
+
+def _convert_regular_number_to_words(num: int) -> str:
+    """
+    Convert a regular integer to Persian words (without large unit processing).
+
+    This is different from _convert_integer_to_words which handles large numbers
+    with units. This function treats the number as a regular number.
+
+    Args:
+        num: Integer to convert
+
+    Returns:
+        Persian words representation
+    """
+    if num == 0:
+        return "صفر"
+    if num < 0:
+        return f"منفی {_convert_regular_number_to_words(-num)}"
+
+    # Convert to string and split into 3-digit chunks, but don't add units
+    num_str = str(num)
+    chunks = []
+    while num_str:
+        chunks.insert(0, num_str[-3:])
+        num_str = num_str[:-3]
+
+    parts = []
+    for chunk in chunks:
+        chunk_val = int(chunk)
+        if chunk_val > 0:
+            part = _three_digit_to_words(chunk_val)
+            parts.append(part)
+
+    return " و ".join(parts)
